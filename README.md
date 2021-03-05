@@ -50,7 +50,7 @@ To simulate selenium and production integration tests:
 One of the key steps in ReDU is the updating of the database to include the latest identifications for files within ReDU. These are the following steps:
 
 1. Download batch template for GNPS at ```https://redu.ucsd.edu/metabatchdump```
-1. Run Batch Workflow for Spectral Library Search
+1. Run [Batch Workflow for Spectral Library Search](https://github.com/mwang87/ReDU-MS2-GNPS/blob/master/code/search_all_data.py)
 1. Get the set of tasks as tsv and save to [here](https://github.com/mwang87/ReDU-MS2-GNPS/blob/master/database/global_tasks.tsv). 
 1. Remove database [here](https://github.com/mwang87/ReDU-MS2-GNPS/tree/master/database)
 1. Remove all untracked files in temp, this will be for the global pca

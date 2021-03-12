@@ -3,6 +3,8 @@ import sys
 sys.path.insert(0, "..")
 from collections import defaultdict
 import json
+import pandas as pd
+
 
 from models import *
 import ming_fileio_library
@@ -17,6 +19,7 @@ except:
     print("no redis")
 
 
+
 def get_dataset_files(dataset_accession, collection_name, massive_host=None):
     dataset_files = None
 
@@ -27,7 +30,7 @@ def get_dataset_files(dataset_accession, collection_name, massive_host=None):
         dataset_files = None
 
     if dataset_files is None:
-        dataset_files = ming_proteosafe_library.get_all_files_in_dataset_folder_ftp(dataset_accession, collection_name, massive_host=massive_host)
+        dataset_files = ming_proteosafe_library.get_all_files_in_dataset_folder_cache(dataset_accession, collection_name, massive_host=massive_host)
         try:
             redis_client.set(dataset_accession, json.dumps(dataset_files), ex=3600)
         except:

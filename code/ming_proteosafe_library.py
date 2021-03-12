@@ -8,6 +8,7 @@ import shutil
 import xmltodict
 import ming_fileio_library
 from collections import defaultdict
+from datetime import datetime
 
 try:
     from requests.packages.urllib3.response import InsecureRequestWarning
@@ -529,6 +530,32 @@ def get_all_files_in_dataset_folder(dataset_accession, folder_prefix, username, 
                     #print("File not included, 0 size", item["path"])
 
     return all_files
+
+def get_all_files_in_dataset_folder_cache(dataset_accession, collection_name, includefilemetadata=False, massive_host=None):
+    # first lets try to read from cache
+    url = "http://dorresteintesthub.ucsd.edu:5235/datasette/database/filename.csv?_stream=on&_sort=filepath&dataset__exact={}&&_size=max".format(dataset_accession)
+    all_files_df = pd.read_csv(url, sep=",")
+    if len(all_files_df) == 0:
+        return get_all_files_in_dataset_folder_ftp(dataset_accession, collection_name, includefilemetadata=includefilemetadata, massive_host=massive_host)
+
+    all_files_df = all_files_df[all_files_df["collection"] == collection_name]
+    
+    return_files_df = pd.DataFrame()
+    return_files_df["path"] = all_files_df["filepath"]
+    return_files_df["timestamp"] = all_files_df["create_time"]
+    
+    if includefilemetadata is False:
+        return list(return_files_df["path"])
+
+    file_list = return_files_df.to_dict(orient="records")
+
+    for file_obj in file_list:
+        timestamp = file_obj["timestamp"]
+        timestamp = datetime.strptime(timestamp, '%Y-%m-%d %H:%M:%S')
+        timestamp = (timestamp-datetime(1970,1,1)).total_seconds()
+        file_obj["timestamp"] = timestamp
+    
+    return file_list
 
 def get_all_files_in_dataset_folder_ftp(dataset_accession, folder_prefix, includefilemetadata=False, massive_host=None):
     import ftputil
